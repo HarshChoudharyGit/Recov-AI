@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RecovAI | Autonomous Revenue Recovery Pipeline</title>
+    <meta name="description" content="Autonomous, agentic revenue recovery pipeline powered by LangGraph.js, Groq AI, and Razorpay to intercept failed payments and eliminate merchant revenue leakage.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <!-- Full-screen Razorpay Lightning Splash Loader -->
+    <div id="rzp-splash-screen" class="rzp-splash-container">
+        <div class="rzp-splash-content">
+            <!-- Electrical Lightning Rays Background -->
+            <div class="rzp-lightning-bg">
+                <div class="lightning-ray ray-1"></div>
+                <div class="lightning-ray ray-2"></div>
+                <div class="lightning-ray ray-3"></div>
+            </div>
+
+            <!-- Razorpay Emblem with Pulsing Energy Ring -->
+            <div class="rzp-logo-wrapper">
+                <div class="rzp-energy-ring"></div>
+                <div class="rzp-lightning-bolt">⚡</div>
+                <svg class="rzp-svg-logo" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M38 4L18 41H0L26 4H38Z" fill="url(#rzp-blue-grad)"/>
+                    <path d="M22 22L13 41H28L34 22H22Z" fill="#0052CC"/>
+                    <text x="45" y="32" fill="#FFFFFF" font-family="'Outfit', sans-serif" font-weight="800" font-size="28" letter-spacing="-0.5">Razorpay</text>
+                    <defs>
+                        <linearGradient id="rzp-blue-grad" x1="0" y1="4" x2="38" y2="41" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#38BDF8"/>
+                            <stop offset="0.5" stop-color="#0C83FD"/>
+                            <stop offset="1" stop-color="#0052CC"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <!-- Lightning Beam Progress Bar -->
+            <div class="rzp-loading-bar-wrap">
+                <div class="rzp-loading-bar-fill"></div>
+                <div class="rzp-loading-spark">⚡</div>
+            </div>
+
+            <!-- Powered By Razorpay Lightning Badge -->
+            <div class="powered-by-razorpay-badge">
+                <svg class="bolt-icon-mini" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span>POWERED BY <strong>RAZORPAY</strong> LIGHTNING RECOVERY ENGINE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Particle Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+    <!-- Background Ambient Gradients -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#bolt-grad)" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <defs>
+                                <linearGradient id="bolt-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#10b981"/>
+                                    <stop offset="1" stop-color="#6366f1"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h2>Recov<span>AI</span></h2>
+                        <p class="tagline">Agentic Revenue Engine</p>
+                    </div>
+                </div>
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span class="status-text">Agent Online</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="tab-dashboard" id="nav-dashboard">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>Overview & KPIs</span>
+                </button>
+                <button class="nav-item" data-tab="tab-workbench" id="nav-workbench">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    <span>Simulation Workbench</span>
+                </button>
+                <button class="nav-item" data-tab="tab-studio" id="nav-studio">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span>Multi-Channel Studio</span>
+                </button>
+                <button class="nav-item" data-tab="tab-ledger" id="nav-ledger">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <span>Recovery Ledger</span>
+                </button>
+                <button class="nav-item" data-tab="tab-guardrails" id="nav-guardrails">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Guardrails & Rules</span>
+                </button>
+                <div class="nav-separator"></div>
+                <button class="nav-item nav-item-demo" data-tab="tab-demo-store" id="nav-demo-store">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <span>Demo Store</span>
+                    <span class="nav-badge-new">LIVE</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="agent-badge">
+                    <span class="badge-label">LangGraph Engine</span>
+                    <span class="badge-val">Groq • Llama / GPT-120B</span>
+                </div>
+                <div class="rzp-badge">
+                    <span class="badge-label">Payment Gateway</span>
+                    <span class="badge-val">Razorpay Webhooks</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navigation / Header -->
+            <header class="top-header">
+                <div class="header-title-wrap">
+                    <h1 id="page-title">Executive Revenue Recovery Dashboard</h1>
+                    <p class="subtitle" id="page-subtitle">Autonomous AI pipeline intercepting payment failures and restoring merchant revenue.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-sm" id="btn-sync-rzp" title="Polls Razorpay for newly paid recovery links">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>⚡ Sync Razorpay</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="btn-refresh-data">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <span>Refresh</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="btn-quick-simulate">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <span>+ Simulate Failure</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- TAB 1: EXECUTIVE DASHBOARD -->
+            <section class="tab-pane active" id="tab-dashboard">
+                <!-- Top Metric Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card card-recovered">
+                        <div class="kpi-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Recovered Revenue</span>
+                            <h3 class="kpi-value" id="kpi-recovered-inr">₹0</h3>
+                            <span class="kpi-subtext positive" id="kpi-recovered-count">0 settled orders</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card card-rate">
+                        <div class="kpi-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Recovery Conversion Rate</span>
+                            <h3 class="kpi-value" id="kpi-recovery-rate">0.0%</h3>
+                            <span class="kpi-subtext" id="kpi-total-tx">Across 0 total failures</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card card-pipeline">
+                        <div class="kpi-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Active In Recovery</span>
+                            <h3 class="kpi-value" id="kpi-pending-inr">₹0</h3>
+                            <span class="kpi-subtext warning" id="kpi-pending-count">0 links dispatched</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card card-escalated">
+                        <div class="kpi-icon-wrap">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Fraud & Guardrail Stops</span>
+                            <h3 class="kpi-value" id="kpi-escalated-inr">₹0</h3>
+                            <span class="kpi-subtext danger" id="kpi-escalated-count">0 hard declines blocked</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Visual Analytics & Charts Grid -->
+                <div class="charts-grid">
+                    <!-- Chart 1: Revenue Velocity Line Chart -->
+                    <div class="glass-card chart-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">📈 Revenue Recovery Velocity & Trends</h3>
+                                <p class="card-subtitle">Real-time comparison of intercepted payment failures vs. successfully recovered capital.</p>
+                            </div>
+                            <div class="chart-legend-custom">
+                                <span class="legend-dot dot-recovered"></span> Recovered (₹)
+                                <span class="legend-dot dot-intercepted"></span> Intercepted (₹)
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-revenue-velocity"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Outcome Breakdown Donut Chart -->
+                    <div class="glass-card chart-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">🍩 Pipeline Outcome Distribution</h3>
+                                <p class="card-subtitle">Breakdown of settled revenue, active recovery links, and blocked fraud.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrap donut-wrap">
+                            <canvas id="chart-outcome-donut"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Row Charts: Decline Breakdown & Channel Conversion -->
+                <div class="charts-grid-secondary">
+                    <!-- Chart 3: Decline Reasons Bar Chart -->
+                    <div class="glass-card chart-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">📊 Decline Reason Financial Value at Risk</h3>
+                                <p class="card-subtitle">Cumulative lost revenue categorized by banking decline error codes.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-decline-bars"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4: Multi-Channel Conversion Comparison -->
+                    <div class="glass-card chart-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">⚡ Multi-Channel Recovery Conversion Rate</h3>
+                                <p class="card-subtitle">Autonomous outreach channel performance benchmark.</p>
+                            </div>
+                        </div>
+                        <div class="chart-canvas-wrap">
+                            <canvas id="chart-channel-conversion"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Funnel & Visual Graph -->
+                <div class="dashboard-split">
+                    <!-- Funnel Stage Card -->
+                    <div class="glass-card funnel-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Autonomous Recovery Lifecycle</h3>
+                                <p class="card-subtitle">End-to-end execution path from webhook capture to settlement.</p>
+                            </div>
+                            <span class="badge badge-emerald">Live LangGraph</span>
+                        </div>
+                        
+                        <div class="funnel-pipeline">
+                            <div class="funnel-step">
+                                <div class="step-circle step-1">1</div>
+                                <div class="step-info">
+                                    <h4>Webhook Interception</h4>
+                                    <p>Captures Razorpay <code>payment.failed</code> events in &lt;10ms.</p>
+                                </div>
+                            </div>
+                            <div class="funnel-arrow">➔</div>
+                            <div class="funnel-step">
+                                <div class="step-circle step-2">2</div>
+                                <div class="step-info">
+                                    <h4>Decline Classification</h4>
+                                    <p>AI separates soft recovery failures from hard fraud/security declines.</p>
+                                </div>
+                            </div>
+                            <div class="funnel-arrow">➔</div>
+                            <div class="funnel-step">
+                                <div class="step-circle step-3">3</div>
+                                <div class="step-info">
+                                    <h4>Guardrail Engine</h4>
+                                    <p>Enforces max retry limits and financial policy rules.</p>
+                                </div>
+                            </div>
+                            <div class="funnel-arrow">➔</div>
+                            <div class="funnel-step">
+                                <div class="step-circle step-4">4</div>
+                                <div class="step-info">
+                                    <h4>Razorpay Link & Multi-AI</h4>
+                                    <p>Generates short links and tailored WhatsApp, SMS, & Email copy.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Failure Distribution Bar -->
+                        <div class="failure-distribution-section">
+                            <h4 class="section-heading">Decline Reasons Breakdown</h4>
+                            <div class="failure-bars" id="failure-distribution-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Audit Feed -->
+                    <div class="glass-card live-feed-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Live Pipeline Activity Feed</h3>
+                                <p class="card-subtitle">Real-time trace logs streamed via Server-Sent Events.</p>
+                            </div>
+                            <span class="live-dot-wrap"><span class="pulse-dot"></span> Streaming</span>
+                        </div>
+                        <div class="live-log-container" id="live-audit-feed">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: SIMULATION WORKBENCH -->
+            <section class="tab-pane" id="tab-workbench">
+                <div class="workbench-grid">
+                    <!-- Simulation Config Form -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">⚡ Interactive Failure Simulator</h3>
+                                <p class="card-subtitle">Trigger simulated webhook payloads to watch the agent execute live.</p>
+                            </div>
+                        </div>
+
+                        <form id="simulation-form" class="sim-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Customer Name</label>
+                                    <input type="text" id="sim-name" class="form-control" value="Rahul Sharma" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Customer Email</label>
+                                    <input type="email" id="sim-email" class="form-control" value="rahul.sharma@example.com" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Amount (INR ₹)</label>
+                                    <input type="number" id="sim-amount" class="form-control" value="1499" min="1" step="1" required>
+                                    <div class="amount-presets">
+                                        <button type="button" class="btn-preset" data-amount="499">₹499</button>
+                                        <button type="button" class="btn-preset" data-amount="1499">₹1,499</button>
+                                        <button type="button" class="btn-preset" data-amount="8999">₹8,999</button>
+                                        <button type="button" class="btn-preset" data-amount="24999">₹24,999</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Current Retry Count</label>
+                                    <select id="sim-retry-count" class="form-control">
+                                        <option value="0">0 (Initial Failure - Fresh Attempt)</option>
+                                        <option value="1">1 (1st Retry)</option>
+                                        <option value="2">2 (2nd Retry)</option>
+                                        <option value="3">3 (Max Retry Threshold Reached)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Failure Code</label>
+                                <select id="sim-failure-code" class="form-control">
+                                    <optgroup label="Soft Declines (Recoverable via AI)">
+                                        <option value="BAD_REQUEST_PAYMENT_TIMED_OUT">BAD_REQUEST_PAYMENT_TIMED_OUT (Timeout)</option>
+                                        <option value="INSUFFICIENT_FUNDS">INSUFFICIENT_FUNDS (Low Balance)</option>
+                                        <option value="GATEWAY_ERROR">GATEWAY_ERROR (Network Glitch)</option>
+                                        <option value="NETWORK_ERROR">NETWORK_ERROR (Bank Connectivity)</option>
+                                    </optgroup>
+                                    <optgroup label="Hard Declines (Security Guardrail Escalation)">
+                                        <option value="CARD_STOLEN_OR_FRAUD">CARD_STOLEN_OR_FRAUD (Stolen / Fraud)</option>
+                                        <option value="INVALID_ACCOUNT_DETAILS">INVALID_ACCOUNT_DETAILS (Non-existent)</option>
+                                        <option value="CARD_EXPIRED">CARD_EXPIRED (Expired Card)</option>
+                                        <option value="RESTRICTED_CARD">RESTRICTED_CARD (Issuer Block)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-run-simulation">
+                                <span class="spinner" id="sim-spinner" style="display:none;"></span>
+                                <span id="sim-btn-text">🚀 Execute RecovAI Agent Pipeline</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Live LangGraph State Visualizer -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">LangGraph State Machine Trace</h3>
+                                <p class="card-subtitle">Real-time visual node transition across the agent graph.</p>
+                            </div>
+                            <span class="badge badge-indigo" id="graph-status-badge">Idle</span>
+                        </div>
+
+                        <div class="graph-visualizer">
+                            <div class="graph-node" id="node-start">
+                                <div class="node-icon">▶</div>
+                                <div class="node-title">__start__</div>
+                                <div class="node-desc">Webhook Payload Ingestion</div>
+                            </div>
+
+                            <div class="graph-connector" id="conn-1"></div>
+
+                            <div class="graph-node" id="node-classify">
+                                <div class="node-icon">🧠</div>
+                                <div class="node-title">classifyNode</div>
+                                <div class="node-desc">Soft vs. Hard Decline Classifier</div>
+                            </div>
+
+                            <div class="graph-connector" id="conn-2"></div>
+
+                            <div class="graph-node" id="node-guardrail">
+                                <div class="node-icon">🛡️</div>
+                                <div class="node-title">checkGuardrails</div>
+                                <div class="node-desc">Fraud Gate &amp; Retry Thresholds</div>
+                            </div>
+
+                            <div class="graph-split-connectors">
+                                <div class="split-branch branch-proceed" id="branch-proceed">
+                                    <span class="branch-label">proceed</span>
+                                    <div class="graph-connector"></div>
+                                </div>
+                                <div class="split-branch branch-escalate" id="branch-escalate">
+                                    <span class="branch-label">stop / escalate</span>
+                                    <div class="graph-connector"></div>
+                                </div>
+                            </div>
+
+                            <div class="graph-row-nodes">
+                                <div class="graph-node" id="node-create-link">
+                                    <div class="node-icon">🔗</div>
+                                    <div class="node-title">createLinkNode</div>
+                                    <div class="node-desc">Razorpay Link API</div>
+                                </div>
+
+                                <div class="graph-node graph-node-end" id="node-end-halt">
+                                    <div class="node-icon">🛑</div>
+                                    <div class="node-title">END (Blocked)</div>
+                                    <div class="node-desc">Escalated to Support</div>
+                                </div>
+                            </div>
+
+                            <div class="graph-connector" id="conn-3"></div>
+
+                            <div class="graph-node" id="node-outreach">
+                                <div class="node-icon">💬</div>
+                                <div class="node-title">generateOutreach</div>
+                                <div class="node-desc">Groq Multi-Channel AI Node</div>
+                            </div>
+
+                            <div class="graph-connector" id="conn-4"></div>
+
+                            <div class="graph-node graph-node-end" id="node-end-success">
+                                <div class="node-icon">🏁</div>
+                                <div class="node-title">END (Recovery Sent)</div>
+                                <div class="node-desc">Multi-channel Messages Dispatched</div>
+                            </div>
+                        </div>
+
+                        <!-- Live Output Preview -->
+                        <div class="sim-result-box" id="sim-result-box" style="display: none;">
+                            <div class="sim-result-header">
+                                <h4 id="sim-res-status-title">Execution Result</h4>
+                                <span class="badge" id="sim-res-badge">Status</span>
+                            </div>
+                            <div class="sim-result-body">
+                                <div class="result-field" id="res-link-row">
+                                    <span class="field-label">Recovery Link:</span>
+                                    <div class="link-field-wrap">
+                                        <a href="#" target="_blank" id="sim-res-link" class="link-text">https://rzp.io/...</a>
+                                        <button class="btn btn-xs btn-secondary" id="btn-copy-sim-link">Copy</button>
+                                    </div>
+                                </div>
+                                <div class="result-field">
+                                    <span class="field-label">WhatsApp Outreach:</span>
+                                    <p class="field-quote" id="sim-res-msg"></p>
+                                </div>
+                                <div class="sim-result-actions" id="sim-result-actions" style="margin-top: 14px; display: flex; gap: 10px;">
+                                    <a href="#" target="_blank" id="btn-sim-open-link" class="btn btn-primary btn-sm" style="flex: 1;">
+                                        🔗 Open Razorpay Test Link
+                                    </a>
+                                    <button type="button" id="btn-sim-resolve" class="btn btn-emerald btn-sm" style="flex: 1;">
+                                        💰 Simulate Customer Payment (Mark Recovered)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MULTI-CHANNEL AI STUDIO -->
+            <section class="tab-pane" id="tab-studio">
+                <div class="studio-layout">
+                    <!-- Left: Channel Selector & Live Config -->
+                    <div class="glass-card studio-controls">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">AI Dynamic Copywriting Engine</h3>
+                                <p class="card-subtitle">Preview tailored recovery outreach across distinct communication channels.</p>
+                            </div>
+                        </div>
+
+                        <div class="channel-buttons">
+                            <button class="channel-btn active" data-channel="whatsapp">
+                                <span class="channel-icon">🟢</span>
+                                <div>
+                                    <strong>WhatsApp Business</strong>
+                                    <small>98% Open Rate • Instant Action</small>
+                                </div>
+                            </button>
+                            <button class="channel-btn" data-channel="sms">
+                                <span class="channel-icon">📱</span>
+                                <div>
+                                    <strong>Transactional SMS</strong>
+                                    <small>High Deliverability • Concise</small>
+                                </div>
+                            </button>
+                            <button class="channel-btn" data-channel="email">
+                                <span class="channel-icon">✉️</span>
+                                <div>
+                                    <strong>HTML Email</strong>
+                                    <small>High-Value B2B / Comprehensive</small>
+                                </div>
+                            </button>
+                            <button class="channel-btn" data-channel="push">
+                                <span class="channel-icon">🔔</span>
+                                <div>
+                                    <strong>In-App Push Alert</strong>
+                                    <small>Direct Mobile Deep-link</small>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div class="studio-info-box">
+                            <h4>Why Multi-Channel AI Recovery?</h4>
+                            <p>RecovAI avoids generic templated emails by using Groq Llama/GPT-120B to craft personalized, respectful, and context-aware messaging with the exact failure code and direct one-tap Razorpay payment links.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Interactive Device Previews -->
+                    <div class="glass-card studio-preview-card">
+                        <!-- WhatsApp Preview -->
+                        <div class="device-preview-pane active" id="preview-whatsapp">
+                            <div class="phone-mockup">
+                                <div class="phone-header">
+                                    <div class="wa-avatar">R</div>
+                                    <div class="wa-user-info">
+                                        <div class="wa-name">RecovAI Concierge <span class="wa-verified">✓</span></div>
+                                        <div class="wa-sub">Official Merchant Recovery</div>
+                                    </div>
+                                </div>
+                                <div class="phone-screen wa-chat">
+                                    <div class="chat-date">TODAY</div>
+                                    <div class="chat-bubble received">
+                                        <p id="wa-preview-text">Hi Rahul, we noticed your payment of ₹1,499 was interrupted (BAD_REQUEST_PAYMENT_TIMED_OUT). You can complete it in 1 click securely using this link: https://rzp.io/rzp/example</p>
+                                        <div class="chat-time">12:34 PM ✓✓</div>
+                                    </div>
+                                    <div class="wa-action-button">
+                                        <a href="#" target="_blank" id="wa-preview-link" class="btn btn-emerald btn-block">💳 Complete Payment (₹1,499)</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SMS Preview -->
+                        <div class="device-preview-pane" id="preview-sms">
+                            <div class="phone-mockup">
+                                <div class="phone-header sms-header">
+                                    <div class="sms-sender">RECOVAI-ALERTS</div>
+                                </div>
+                                <div class="phone-screen sms-screen">
+                                    <div class="sms-bubble">
+                                        <p id="sms-preview-text">RecovAI: Payment of INR 1499 failed (BAD_REQUEST_PAYMENT_TIMED_OUT). Complete your order now: https://rzp.io/rzp/example</p>
+                                        <span class="sms-time">Now • via SMS</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Preview -->
+                        <div class="device-preview-pane" id="preview-email">
+                            <div class="email-mockup">
+                                <div class="email-header">
+                                    <div class="email-subject-line">
+                                        <span class="subject-label">Subject:</span>
+                                        <strong id="email-preview-subject">Action Required: Complete your order with RecovAI</strong>
+                                    </div>
+                                    <div class="email-meta">
+                                        <span>From: <strong>RecovAI Payments &lt;recovery@recovai.internal&gt;</strong></span>
+                                        <span>To: <strong>rahul.sharma@example.com</strong></span>
+                                    </div>
+                                </div>
+                                <div class="email-body" id="email-preview-body">
+                                    <p>Dear Rahul,</p>
+                                    <p>We noticed a momentary timeout while processing your transaction of ₹1,499.</p>
+                                    <p>To ensure your order is confirmed without delay, please use the secure payment button below:</p>
+                                    <div class="email-cta-box">
+                                        <a href="#" target="_blank" id="email-preview-btn" class="btn btn-primary">Complete Payment Securely</a>
+                                    </div>
+                                    <p class="email-footer-text">This link is securely powered by Razorpay and expires in 24 hours.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Push Preview -->
+                        <div class="device-preview-pane" id="preview-push">
+                            <div class="push-mockup">
+                                <div class="push-notification-banner">
+                                    <div class="push-header">
+                                        <div class="push-app-name">⚡ RECOVAI MERCHANT</div>
+                                        <span class="push-time">Just now</span>
+                                    </div>
+                                    <div class="push-title">Payment Attention Required</div>
+                                    <div class="push-msg" id="push-preview-text">Tap here to finish your pending order of ₹1,499 in 1 tap.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: RECOVERY LEDGER -->
+            <section class="tab-pane" id="tab-ledger">
+                <div class="glass-card ledger-card">
+                    <div class="card-header ledger-header">
+                        <div>
+                            <h3 class="card-title">Persistent Transaction Recovery Ledger</h3>
+                            <p class="card-subtitle">Real-time SQLite database tracking every intercepted transaction, generated link, and recovery state.</p>
+                        </div>
+                        <div class="ledger-filter-wrap">
+                            <input type="text" id="ledger-search" class="form-control search-input" placeholder="Search by email, name, tx ID...">
+                            <select id="ledger-status-filter" class="form-control filter-select">
+                                <option value="ALL">All Statuses</option>
+                                <option value="RECOVERED">Recovered (Paid)</option>
+                                <option value="RECOVERY_SENT">Recovery Sent (Active)</option>
+                                <option value="HARD_DECLINE">Hard Decline</option>
+                                <option value="MAX_RETRIES_EXCEEDED">Max Retries</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Failure Code</th>
+                                    <th>Status</th>
+                                    <th>Retries</th>
+                                    <th>Timestamp</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody">
+                                <tr><td colspan="8" class="text-center py-4">Loading ledger transactions...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: GUARDRAILS & RULES -->
+            <section class="tab-pane" id="tab-guardrails">
+                <div class="glass-card guardrail-card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">🛡️ Financial Guardrails & Merchant Policy Matrix</h3>
+                            <p class="card-subtitle">Configure strict rule-based guardrails enforced before generating recovery links.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-save-guardrails">Save Policy Changes</button>
+                    </div>
+
+                    <div class="guardrail-settings-grid">
+                        <div class="setting-item">
+                            <label>Maximum Recovery Retries Per Transaction</label>
+                            <p class="setting-desc">Halts autonomous outreach once retry threshold is met to prevent customer fatigue.</p>
+                            <div class="range-wrap">
+                                <input type="range" id="setting-max-retries" min="1" max="5" step="1" value="3" class="slider">
+                                <span class="range-val" id="val-max-retries">3 attempts</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>High-Value VIP Threshold (INR ₹)</label>
+                            <p class="setting-desc">Transactions above this threshold get prioritized VIP outreach concierge copy.</p>
+                            <input type="number" id="setting-vip-threshold" class="form-control" value="25000">
+                        </div>
+
+                        <div class="setting-item full-width">
+                            <label>Soft Decline Classification Codes (Auto-Recoverable)</label>
+                            <p class="setting-desc">Failure codes that trigger automatic Razorpay link generation and AI messaging.</p>
+                            <div class="tag-container" id="soft-codes-tags">
+                                <span class="tag tag-soft">BAD_REQUEST_PAYMENT_TIMED_OUT</span>
+                                <span class="tag tag-soft">GATEWAY_ERROR</span>
+                                <span class="tag tag-soft">INSUFFICIENT_FUNDS</span>
+                                <span class="tag tag-soft">NETWORK_ERROR</span>
+                                <span class="tag tag-soft">ISSUER_DOWN</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item full-width">
+                            <label>Hard Decline Classification Codes (Fraud & Security Stops)</label>
+                            <p class="setting-desc">Failure codes that are immediately halted without customer outreach to avoid fraud/compliance breach.</p>
+                            <div class="tag-container" id="hard-codes-tags">
+                                <span class="tag tag-hard">CARD_STOLEN_OR_FRAUD</span>
+                                <span class="tag tag-hard">INVALID_ACCOUNT_DETAILS</span>
+                                <span class="tag tag-hard">CARD_EXPIRED</span>
+                                <span class="tag tag-hard">SUSPECTED_FRAUD</span>
+                                <span class="tag tag-hard">RESTRICTED_CARD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: DEMO E-COMMERCE STORE -->
+            <section class="tab-pane" id="tab-demo-store">
+                <!-- Demo Store Header -->
+                <div class="demo-store-header">
+                    <div class="demo-store-banner">
+                        <div class="demo-banner-content">
+                            <span class="demo-banner-badge">🛒 Interactive Demo</span>
+                            <h2>Experience RecovAI in Action</h2>
+                            <p>Browse products, add to cart, and checkout. The payment will <strong>intentionally fail</strong>, and you'll see RecovAI's autonomous recovery pipeline activate in real-time.</p>
+                        </div>
+                        <div class="demo-banner-steps">
+                            <div class="demo-step">
+                                <span class="demo-step-num">1</span>
+                                <span>Add Items</span>
+                            </div>
+                            <div class="demo-step-arrow">→</div>
+                            <div class="demo-step">
+                                <span class="demo-step-num">2</span>
+                                <span>Checkout</span>
+                            </div>
+                            <div class="demo-step-arrow">→</div>
+                            <div class="demo-step">
+                                <span class="demo-step-num">3</span>
+                                <span>Payment Fails</span>
+                            </div>
+                            <div class="demo-step-arrow">→</div>
+                            <div class="demo-step demo-step-highlight">
+                                <span class="demo-step-num">4</span>
+                                <span>RecovAI Recovers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-store-layout">
+                    <!-- Product Grid -->
+                    <div class="demo-products-section">
+                        <div class="demo-section-header">
+                            <h3>🏪 Product Catalog</h3>
+                            <span class="demo-item-count" id="demo-product-count">6 products</span>
+                        </div>
+                        <div class="demo-products-grid" id="demo-products-grid">
+                            <!-- Products populated dynamically -->
+                            <div class="demo-product-skeleton"></div>
+                            <div class="demo-product-skeleton"></div>
+                            <div class="demo-product-skeleton"></div>
+                            <div class="demo-product-skeleton"></div>
+                            <div class="demo-product-skeleton"></div>
+                            <div class="demo-product-skeleton"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Sidebar -->
+                    <div class="demo-cart-section glass-card" id="demo-cart-section">
+                        <div class="demo-cart-header">
+                            <h3>🛍️ Your Cart</h3>
+                            <span class="demo-cart-badge" id="demo-cart-badge">0</span>
+                        </div>
+
+                        <div class="demo-cart-empty" id="demo-cart-empty">
+                            <div class="demo-cart-empty-icon">🛒</div>
+                            <p>Your cart is empty</p>
+                            <span>Add products to get started</span>
+                        </div>
+
+                        <div class="demo-cart-items" id="demo-cart-items" style="display:none;">
+                            <!-- Cart items populated dynamically -->
+                        </div>
+
+                        <div class="demo-cart-footer" id="demo-cart-footer" style="display:none;">
+                            <div class="demo-cart-total">
+                                <span>Total</span>
+                                <strong id="demo-cart-total">₹0</strong>
+                            </div>
+
+                            <div class="demo-checkout-form">
+                                <div class="form-group">
+                                    <label>Your Name</label>
+                                    <input type="text" id="demo-cust-name" class="form-control" value="Priya Patel" placeholder="Enter your name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" id="demo-cust-email" class="form-control" value="priya.patel@example.com" placeholder="Enter your email">
+                                </div>
+                                <div class="form-group">
+                                    <label>Failure Scenario</label>
+                                    <select id="demo-failure-code" class="form-control">
+                                        <option value="BAD_REQUEST_PAYMENT_TIMED_OUT">⏱️ Payment Timed Out</option>
+                                        <option value="INSUFFICIENT_FUNDS">💳 Insufficient Funds</option>
+                                        <option value="GATEWAY_ERROR">🌐 Gateway Error</option>
+                                        <option value="NETWORK_ERROR">📡 Network Error</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary btn-block btn-lg demo-checkout-btn" id="demo-checkout-btn">
+                                <span id="demo-checkout-text">💳 Pay Now</span>
+                                <span class="spinner" id="demo-checkout-spinner" style="display:none;"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Flow Overlay -->
+                <div class="demo-recovery-overlay" id="demo-recovery-overlay" style="display:none;">
+                    <div class="demo-recovery-modal glass-card">
+                        <!-- Stage 1: Processing -->
+                        <div class="demo-stage" id="demo-stage-processing">
+                            <div class="rzp-modal-loader">
+                                <div class="rzp-modal-logo-box">
+                                    <div class="rzp-modal-bolt-glow">⚡</div>
+                                    <svg class="rzp-modal-svg" viewBox="0 0 200 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M38 4L18 41H0L26 4H38Z" fill="url(#rzp-m-grad)"/>
+                                        <path d="M22 22L13 41H28L34 22H22Z" fill="#0052CC"/>
+                                        <text x="45" y="32" fill="#FFFFFF" font-family="'Outfit', sans-serif" font-weight="800" font-size="26">Razorpay</text>
+                                        <defs>
+                                            <linearGradient id="rzp-m-grad" x1="0" y1="4" x2="38" y2="41" gradientUnits="userSpaceOnUse">
+                                                <stop stop-color="#38BDF8"/>
+                                                <stop offset="1" stop-color="#0C83FD"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                </div>
+                                <div class="rzp-electric-beam"></div>
+                            </div>
+                            <h3>Processing Payment...</h3>
+                            <div class="powered-by-tag">
+                                <span>⚡ Powered by <strong>Razorpay Smart Router</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Stage 2: Failure -->
+                        <div class="demo-stage" id="demo-stage-failure" style="display:none;">
+                            <div class="demo-failure-animation">
+                                <div class="demo-failure-icon">✕</div>
+                            </div>
+                            <h3 class="demo-failure-title">Payment Failed!</h3>
+                            <p class="demo-failure-reason" id="demo-failure-reason">BAD_REQUEST_PAYMENT_TIMED_OUT</p>
+                            <div class="demo-failure-amount" id="demo-failure-amount">₹0</div>
+                        </div>
+
+                        <!-- Stage 3: RecovAI Activating -->
+                        <div class="demo-stage" id="demo-stage-activating" style="display:none;">
+                            <div class="rzp-activation-header">
+                                <div class="rzp-ai-bolt-orb">
+                                    <span class="lightning-spark-left">⚡</span>
+                                    <svg class="rzp-mini-logo" viewBox="0 0 40 40" fill="none">
+                                        <path d="M26 4L12 36H0L18 4H26Z" fill="#38BDF8"/>
+                                        <path d="M15 20L9 36H19L23 20H15Z" fill="#0052CC"/>
+                                    </svg>
+                                    <span class="lightning-spark-right">⚡</span>
+                                </div>
+                            </div>
+                            <h3>RecovAI Agent Activated</h3>
+                            <div class="powered-by-tag tag-emerald">
+                                <span>⚡ Powered by <strong>Razorpay Recovery Link API</strong></span>
+                            </div>
+                            <div class="demo-agent-steps" id="demo-agent-steps">
+                                <div class="demo-agent-step" id="demo-astep-classify">
+                                    <span class="demo-step-spinner"></span>
+                                    <span>Classifying decline code...</span>
+                                </div>
+                                <div class="demo-agent-step" id="demo-astep-guardrail">
+                                    <span class="demo-step-spinner"></span>
+                                    <span>Checking guardrails...</span>
+                                </div>
+                                <div class="demo-agent-step" id="demo-astep-link">
+                                    <span class="demo-step-spinner"></span>
+                                    <span>Generating Razorpay recovery link...</span>
+                                </div>
+                                <div class="demo-agent-step" id="demo-astep-ai">
+                                    <span class="demo-step-spinner"></span>
+                                    <span>Crafting AI recovery messages...</span>
+                                </div>
+                                <div class="demo-agent-step" id="demo-astep-email">
+                                    <span class="demo-step-spinner"></span>
+                                    <span>Dispatching recovery email...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stage 4: Recovery Ready -->
+                        <div class="demo-stage" id="demo-stage-recovery" style="display:none;">
+                            <div class="demo-recovery-success-icon">🎯</div>
+                            <h3>Recovery Link Generated!</h3>
+                            <p>The customer would receive this across all channels:</p>
+
+                            <div class="demo-recovery-details">
+                                <div class="demo-recovery-link-box">
+                                    <span class="demo-rl-label">Recovery Link</span>
+                                    <a href="#" target="_blank" id="demo-recovery-link" class="demo-rl-url">https://rzp.io/rzp/...</a>
+                                </div>
+
+                                <div class="demo-recovery-channels">
+                                    <div class="demo-channel-preview" id="demo-ch-whatsapp">
+                                        <div class="demo-ch-icon">🟢</div>
+                                        <div class="demo-ch-content">
+                                            <strong>WhatsApp</strong>
+                                            <p id="demo-ch-wa-text"></p>
+                                        </div>
+                                    </div>
+                                    <div class="demo-channel-preview" id="demo-ch-sms">
+                                        <div class="demo-ch-icon">📱</div>
+                                        <div class="demo-ch-content">
+                                            <strong>SMS</strong>
+                                            <p id="demo-ch-sms-text"></p>
+                                        </div>
+                                    </div>
+                                    <div class="demo-channel-preview" id="demo-ch-push">
+                                        <div class="demo-ch-icon">🔔</div>
+                                        <div class="demo-ch-content">
+                                            <strong>Push Notification</strong>
+                                            <p id="demo-ch-push-text"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="demo-recovery-actions">
+                                <button class="btn btn-emerald btn-lg btn-block" id="demo-btn-pay-recovery">
+                                    ✅ Complete Payment via Recovery Link
+                                </button>
+                                <button class="btn btn-secondary btn-sm" id="demo-btn-close-recovery">
+                                    Close & View in Ledger
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stage 5: Payment Recovered -->
+                        <div class="demo-stage" id="demo-stage-recovered" style="display:none;">
+                            <div class="demo-recovered-animation">
+                                <div class="demo-check-circle">✓</div>
+                            </div>
+                            <h3 class="demo-recovered-title">Revenue Recovered! 🎉</h3>
+                            <p id="demo-recovered-amount">₹0 successfully recovered</p>
+                            <div class="demo-recovered-stats">
+                                <div class="demo-rstat">
+                                    <span class="demo-rstat-label">Transaction</span>
+                                    <span class="demo-rstat-value" id="demo-recovered-txid">pay_demo_...</span>
+                                </div>
+                                <div class="demo-rstat">
+                                    <span class="demo-rstat-label">Status</span>
+                                    <span class="demo-rstat-value demo-status-recovered">RECOVERED</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="demo-btn-restart">
+                                🔄 Try Another Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Side Drawer for Detailed Transaction Inspector -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+    <div class="side-drawer" id="side-drawer">
+        <div class="drawer-header">
+            <div>
+                <h3 id="drawer-tx-title">Transaction Inspector</h3>
+                <span class="badge" id="drawer-status-badge">STATUS</span>
+            </div>
+            <button class="drawer-close" id="btn-close-drawer">✕</button>
+        </div>
+
+        <div class="drawer-content">
+            <div class="drawer-section">
+                <h4>Customer & Payment Metadata</h4>
+                <div class="drawer-meta-grid" id="drawer-meta-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <div class="drawer-section" id="drawer-link-section">
+                <h4>Razorpay Recovery Link</h4>
+                <div class="drawer-link-box">
+                    <a href="#" target="_blank" id="drawer-recovery-link" class="link-text">https://rzp.io/...</a>
+                    <button class="btn btn-xs btn-secondary" id="btn-copy-drawer-link">Copy</button>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <h4>AI Generated Multi-Channel Copy</h4>
+                <div class="drawer-channel-box" id="drawer-channel-copy">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <h4>Full Execution Audit Trail</h4>
+                <div class="drawer-audit-list" id="drawer-audit-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <div class="drawer-footer" style="display: flex; gap: 10px;">
+            <button class="btn btn-indigo btn-block" id="btn-drawer-send-email">
+                📧 Send Recovery Email
+            </button>
+            <button class="btn btn-emerald btn-block" id="btn-drawer-resolve">
+                💰 Simulate Payment Resolution (Mark Recovered)
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
