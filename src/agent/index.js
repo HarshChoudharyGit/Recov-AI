@@ -62,8 +62,18 @@ const createLinkNode = async (state) => {
     const rzp = getRazorpayClient();
     let paymentLink;
 
+    // Sanitize customer phone for Razorpay (must be valid 10 digits)
+    let cleanPhone = (state.customerPhone || "").replace(/\D/g, "");
+    if (cleanPhone.length > 10 && cleanPhone.startsWith("91")) {
+        cleanPhone = cleanPhone.slice(2);
+    }
+    if (cleanPhone.length !== 10) {
+        cleanPhone = "9876543210";
+    }
+
     try {
-        if (!rzp) throw new Error("Razorpay not configured");
+        if (!rzp) throw new Error("Razorpay client not initialized — check RZP_TEST_KEY_ID in .env");
+
         paymentLink = await rzp.paymentLink.create({
             amount: Math.round(state.amountInr * 100),
             currency: "INR",
@@ -71,11 +81,14 @@ const createLinkNode = async (state) => {
             customer: {
                 name: state.customerName || "Valued Customer",
                 email: state.customerEmail || "customer@example.com",
-                contact: state.customerPhone || "+919876543210",
+                contact: "+91" + cleanPhone,
             },
             notify: { email: false, sms: false },
         });
+        console.log(`\n✅ [RAZORPAY LINK CREATED] ID: ${paymentLink.id} | URL: ${paymentLink.short_url}`);
     } catch (err) {
+        const errMsg = err?.error?.description || err?.message || JSON.stringify(err);
+        console.error(`\n❌ [RAZORPAY API ERROR] Could not create live payment link: ${errMsg}`);
         const fallbackUrl = `https://rzp.io/rzp/mock_${state.transactionId}`;
         paymentLink = { id: `plink_mock_${Date.now()}`, short_url: fallbackUrl };
     }
