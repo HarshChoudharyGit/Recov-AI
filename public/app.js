@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Tabs
         navItems: document.querySelectorAll(".nav-item"),
         tabPanes: document.querySelectorAll(".tab-pane"),
+        sidebar: document.querySelector(".sidebar"),
+        mobileMenuToggle: document.getElementById("mobile-menu-toggle"),
         pageTitle: document.getElementById("page-title"),
         pageSubtitle: document.getElementById("page-subtitle"),
         
@@ -448,11 +450,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Mobile Menu Toggle
+    if (elements.mobileMenuToggle && elements.sidebar) {
+        elements.mobileMenuToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            elements.sidebar.classList.toggle("mobile-open");
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener("click", (e) => {
+            if (elements.sidebar.classList.contains("mobile-open") &&
+                !elements.sidebar.contains(e.target) &&
+                e.target !== elements.mobileMenuToggle) {
+                elements.sidebar.classList.remove("mobile-open");
+            }
+        });
+    }
+
     // Tab Navigation
     elements.navItems.forEach((btn) => {
         btn.addEventListener("click", () => {
             const tabId = btn.dataset.tab;
             switchTab(tabId);
+            // Close mobile menu on tab switch
+            if (elements.sidebar) {
+                elements.sidebar.classList.remove("mobile-open");
+            }
         });
     });
 

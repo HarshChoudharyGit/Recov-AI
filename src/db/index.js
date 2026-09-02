@@ -8,8 +8,12 @@ const dbPath = path.join(__dirname, "..", "..", "recovai.db");
 
 const db = new Database(dbPath);
 
-// Enable WAL mode for better concurrent read performance
+// High-performance SQLite tuning: WAL mode, 64MB RAM cache, memory temp store, normal sync
 db.pragma("journal_mode = WAL");
+db.pragma("synchronous = NORMAL");
+db.pragma("temp_store = MEMORY");
+db.pragma("cache_size = -64000");
+db.pragma("mmap_size = 268435456");
 
 // Initialize schema
 db.exec(`
@@ -43,6 +47,14 @@ db.exec(`
     key TEXT PRIMARY KEY,
     value TEXT
   );
+
+  -- High Performance Indexes for Instant Lookups & Aggregations
+  CREATE INDEX IF NOT EXISTS idx_tx_transaction_id ON transactions(transaction_id);
+  CREATE INDEX IF NOT EXISTS idx_tx_payment_link_id ON transactions(payment_link_id);
+  CREATE INDEX IF NOT EXISTS idx_tx_recovery_link ON transactions(recovery_link);
+  CREATE INDEX IF NOT EXISTS idx_tx_status ON transactions(status);
+  CREATE INDEX IF NOT EXISTS idx_tx_created_at ON transactions(created_at);
+  CREATE INDEX IF NOT EXISTS idx_audit_transaction_id ON audit_logs(transaction_id);
 `);
 
 // Migration for existing tables: ensure payment_link_id column exists
